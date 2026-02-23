@@ -1,0 +1,9 @@
+name: cgcnn-inference
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip:
+    - pymatgen>=2023.11.0
+    - numpy>=1.24.0

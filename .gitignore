@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Temp files
+temp/
+
+# Windows/WSL metadata
+*:Zone.Identifier
+
+# Model checkpoints (tracked in Azure ML model registry)
+*.pt
+*.pth
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Azure ML artifacts
+azureml-logs/
+outputs/
+
+# Env files
+.env

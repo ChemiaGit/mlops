@@ -1,0 +1,15 @@
+# Azure ML SDK
+azure-ai-ml>=1.12.0
+azure-identity>=1.15.0
+
+# CGCNN inference dependencies
+torch>=2.0.0
+pymatgen>=2023.11.0
+numpy>=1.24.0
+
+# GFlowNet inference dependencies
+# (model source from mat-gen/src/gflownet must be bundled separately)
+ase>=3.22.0
+
+# Optional: FAIRChem oracle for GFlowNet reward evaluation
+# fairchem-core>=2.0.0  # large install, only needed for full reward computation
