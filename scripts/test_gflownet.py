@@ -107,6 +107,30 @@ def print_score(data: dict):
 
 
 # ---------------------------------------------------------------------------
+# CIF export
+# ---------------------------------------------------------------------------
+
+def save_cifs(samples: list, output_dir: str):
+    """Write CIF strings returned by the endpoint directly to disk."""
+    os.makedirs(output_dir, exist_ok=True)
+    saved = 0
+    for i, s in enumerate(samples):
+        if "error" in s or "cif" not in s:
+            continue
+        si_al   = s.get("si_al_ratio", 0.0)
+        reward  = s.get("reward", 0.0)
+        cfg_str = "".join(str(v) for v in s.get("config", []))
+        fname   = f"structure_{i+1:03d}_SiAl{si_al:.2f}_R{reward:.4f}_{cfg_str}.cif"
+        fpath   = os.path.join(output_dir, fname)
+        with open(fpath, "w") as f:
+            f.write(s["cif"])
+        print(f"  [{i+1}] {fname}")
+        saved += 1
+
+    print(f"\nSaved {saved} CIF file(s) to {os.path.abspath(output_dir)}/")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -137,6 +161,10 @@ def main():
         "--json", action="store_true", dest="raw_json",
         help="Print raw JSON response instead of formatted output"
     )
+    parser.add_argument(
+        "--save-cif", metavar="DIR", default=None,
+        help="Save generated structures as CIF files to DIR (generate mode only)"
+    )
     args = parser.parse_args()
 
     try:
@@ -166,6 +194,8 @@ def main():
 
     if data.get("mode") == "generate":
         print_generate(data)
+        if args.save_cif:
+            save_cifs(data.get("samples", []), args.save_cif)
     elif data.get("mode") == "score":
         print_score(data)
     else:

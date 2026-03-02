@@ -45,6 +45,7 @@ Output JSON (score):
     }
 """
 
+import io
 import json
 import logging
 import os
@@ -110,8 +111,10 @@ def init():
     from environment import FaujasiteEnvironment
     from model import GFlowNet
 
-    # Instantiate environment
-    env = FaujasiteEnvironment()
+    # Instantiate environment — use the bundled FAU.cif so we always get the
+    # real Faujasite T-site positions (matches training), never the FCC fallback.
+    _cif = os.path.join(os.path.dirname(__file__), "FAU.cif")
+    env = FaujasiteEnvironment(template_path=_cif if os.path.exists(_cif) else None)
 
     hidden_dim = int(os.environ.get("GFN_HIDDEN_DIM", "256"))
     num_layers  = int(os.environ.get("GFN_NUM_LAYERS", "3"))
@@ -206,6 +209,15 @@ def _handle_generate(data: dict) -> str:
                     sample["proxy_energy"] = float(result.get("energy", 0.0))
                 except Exception as e:
                     logger.warning(f"Proxy evaluation failed: {e}")
+
+            try:
+                from ase.io import write as ase_write
+                atoms = env.state_to_atoms(final_state)
+                buf = io.BytesIO()
+                ase_write(buf, atoms, format="cif")
+                sample["cif"] = buf.getvalue().decode("utf-8")
+            except Exception as e:
+                logger.warning(f"CIF generation failed: {e}")
 
             samples.append(sample)
         except Exception as e:
